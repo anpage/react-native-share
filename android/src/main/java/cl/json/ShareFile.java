@@ -8,7 +8,9 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
+import android.support.v4.content.FileProvider;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 
@@ -136,6 +138,19 @@ public class ShareFile {
             }
         } else if(this.isLocalFile()) {
             Uri uri = Uri.parse(this.url);
+            File file = new File(uri.getPath());
+            try {
+                Uri fileUri = FileProvider.getUriForFile(
+                        this.reactContext.getApplicationContext(),
+                        this.reactContext.getPackageName(),
+                        file);
+                Log.i("File","URI: "+fileUri.getPath());
+                return fileUri;
+            } catch (IllegalArgumentException e) {
+                Log.e("File Selector",
+                        "The selected file can't be shared: " +
+                                file.getName());
+            }
 
             return uri;
         }
